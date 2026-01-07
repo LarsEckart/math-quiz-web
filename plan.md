@@ -257,7 +257,7 @@ POST /quiz/answer   → feedback fragment + OOB updates
 
 ---
 
-### Milestone 6: Kid-Friendly UI
+### Milestone 6: Kid-Friendly UI ✅
 **Goal:** Big colorful numbers, animations, streak/stars display
 
 **CSS (`public/app.css`):**

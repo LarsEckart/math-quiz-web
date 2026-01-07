@@ -123,6 +123,7 @@ public class QuizHandler {
         model.put("totalStars", service.getTotalStars());
         model.put("rangeExpanded", result.rangeExpanded());
         model.put("newOperationUnlocked", result.newOperationUnlocked());
+        model.put("newStars", result.newStars());
         
         ctx.render("fragments/feedback.jte", model);
     }

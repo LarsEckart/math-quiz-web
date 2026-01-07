@@ -7,6 +7,7 @@
 @param int totalStars
 @param boolean rangeExpanded
 @param Operation newOperationUnlocked
+@param int newStars
 
 <div class="feedback ${correct ? "correct" : "incorrect"}">
     @if(correct)
@@ -15,6 +16,10 @@
     @else
         <div class="feedback-icon">❌</div>
         <div class="feedback-text">Vale! Õige vastus: ${correctAnswer}</div>
+    @endif
+
+    @if(newStars > 0)
+        <div class="star-earned">⭐</div>
     @endif
 
     @if(rangeExpanded)
