@@ -319,31 +319,110 @@ document.addEventListener('keydown', (e) => {
 ---
 
 ### Milestone 8: Deployment (Oracle Cloud VM)
-**Goal:** Production deployment with TLS
+**Goal:** Production deployment with persistent storage
 
-**VM layout:**
+#### Oracle Cloud Free Tier Setup
+
+**Region:** EU-Stockholm-1 (already configured)
+
+**Compute Instance:**
+- Shape: `VM.Standard.E2.1.Micro` (Always Free)
+- 1 OCPU, 1GB RAM
+- Oracle Linux 9
+
+**Storage Architecture:**
 ```
-/opt/mathquiz/app.jar
-/var/lib/mathquiz/quiz.db
-/var/lib/mathquiz/tts/    (cached .wav files)
+┌─────────────────────────────────────────────────────────────────┐
+│                    Oracle Cloud Free Tier                       │
+│                                                                 │
+│  ┌───────────────────┐       ┌─────────────────────────────┐   │
+│  │ Compute Instance  │       │  Block Volume (50GB)        │   │
+│  │ VM.Standard.E2.1  │──────▶│  Mounted at /app            │   │
+│  │    .Micro         │       │                             │   │
+│  │                   │       │  /app/                      │   │
+│  │  - Java 21        │       │    ├── math-quiz.jar        │   │
+│  │  - systemd svc    │       │    └── data/                │   │
+│  │  - nginx          │       │         ├── quiz.db         │   │
+│  └───────────────────┘       │         └── tts/            │   │
+│          ▲                   └─────────────────────────────┘   │
+│          │                              ▲                      │
+│     ephemeral                      PERSISTS                    │
+│  (recreate = gone)            (survives instance delete)       │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**systemd service:** `/etc/systemd/system/mathquiz.service`
+**Why attached block volume?**
+| Scenario | Boot volume only | With attached volume |
+|----------|------------------|---------------------|
+| Reboot | Data safe | Data safe |
+| Stop/Start | Data safe | Data safe |
+| Terminate & recreate | **Data LOST** ❌ | **Data safe** ✅ |
+
+**Network setup:**
+- VCN (Virtual Cloud Network) with public subnet
+- Security list: allow inbound 22 (SSH), 80, 443, 8080
+- Public IP (can be reserved to survive instance recreation)
+
+#### One-Time Infrastructure Setup (via OCI CLI)
+
+1. Create VCN + subnet + security rules
+2. Create compute instance
+3. Create and attach 50GB block volume
+4. Reserve public IP
+5. SSH in: install Java 21, configure systemd service
+
+#### Deployment Flow (updates)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Local:                                                     │
+│  ./gradlew shadowJar                                        │
+│         │                                                   │
+│         ▼                                                   │
+│  scp build/libs/math-quiz.jar oracle-vm:/app/              │
+│         │                                                   │
+│         ▼                                                   │
+│  ssh oracle-vm "sudo systemctl restart mathquiz"            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**No new instance needed for updates** — just upload jar and restart service.
+
+#### VM Layout
+
+```
+/app/                          (block volume mount)
+  ├── math-quiz.jar
+  └── data/
+      ├── quiz.db
+      └── tts/                 (cached .wav files)
+```
+
+#### systemd Service
+
+`/etc/systemd/system/mathquiz.service`
 - Runs jar as `mathquiz` user
-- Env vars: `PORT=8080`, `DATA_DIR=/var/lib/mathquiz`
+- Env vars: `PORT=8080`, `DATA_DIR=/app/data`
 - Restart on failure
 
-**Nginx reverse proxy:**
-- `443 → localhost:8080`
-- Long cache headers for `/audio/*`
-- Let's Encrypt TLS via certbot
+#### Nginx Reverse Proxy
 
-**Backups:**
-- Nightly cron copies `quiz.db` to dated backup
-- TTS cache can be rebuilt (DB is critical)
+- `80 → localhost:8080` (or 443 with TLS)
+- Long cache headers for `/audio/*`
+- Optional: Let's Encrypt TLS via certbot (requires domain)
+
+#### Access
+
+- **Without domain:** `http://<public-ip>:8080` or via nginx on port 80
+- **With domain:** Point DNS A record to public IP, use certbot for HTTPS
+
+#### Backups
+
+- Weekly cron: copy `quiz.db` to OCI Object Storage (also free tier)
+- TTS cache can be rebuilt (not critical to back up)
 
 **Test:** Smoke test on VM, verify persistence across restarts  
-**Deliverable:** Public HTTPS deployment
+**Deliverable:** Public deployment with persistent storage
 
 ---
 
