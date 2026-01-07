@@ -141,7 +141,7 @@ var problem = pool.pickRandom(random);  // uniform distribution
 
 ---
 
-### Milestone 3: SQLite Schema + Repository
+### Milestone 3: SQLite Schema + Repository ✅
 **Goal:** Persistence layer, integration-tested
 
 **Schema (Flyway migrations):**
