@@ -5,12 +5,15 @@ import mathquiz.domain.Problem;
 import mathquiz.service.AnswerResult;
 import mathquiz.service.QuizService;
 import mathquiz.storage.Repository;
+import mathquiz.tts.EstonianSpeechFormatter;
+import mathquiz.tts.TtsCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Handles the quiz flow - problems and answers.
@@ -22,10 +25,12 @@ public class QuizHandler {
     
     private final Repository repo;
     private final Clock clock;
+    private final TtsCacheService ttsService;
     
-    public QuizHandler(Repository repo, Clock clock) {
+    public QuizHandler(Repository repo, Clock clock, TtsCacheService ttsService) {
         this.repo = repo;
         this.clock = clock;
+        this.ttsService = ttsService;
     }
     
     /**
@@ -62,10 +67,16 @@ public class QuizHandler {
         
         log.debug("Generated problem: {} for user {}", problem, PlayerHandler.getUserId(ctx));
         
+        // Generate audio for the problem
+        String speechText = EstonianSpeechFormatter.formatProblem(
+                problem.operand1(), problem.operation(), problem.operand2());
+        Optional<String> audioHash = ttsService.getAudioHash(speechText);
+        
         Map<String, Object> model = new HashMap<>();
         model.put("operand1", problem.operand1());
         model.put("operand2", problem.operand2());
         model.put("operation", problem.operation());
+        model.put("audioHash", audioHash.orElse(null));
         
         ctx.render("fragments/problem.jte", model);
     }
@@ -107,12 +118,26 @@ public class QuizHandler {
             return;
         }
         
+        // Capture the problem before submitting (it gets cleared)
+        Problem problem = service.currentProblem();
+        
         // Submit and get result
         AnswerResult result = service.submitAnswer(answer);
         
         log.info("Answer submitted: {} -> {} for user {}", 
                 answerStr, result.correct() ? "correct" : "incorrect", 
                 PlayerHandler.getUserId(ctx));
+        
+        // Generate feedback audio
+        String feedbackText;
+        if (result.correct()) {
+            feedbackText = EstonianSpeechFormatter.formatCorrect(
+                    problem.operand1(), problem.operation(), problem.operand2(), result.correctAnswer());
+        } else {
+            feedbackText = EstonianSpeechFormatter.formatIncorrect(
+                    problem.operand1(), problem.operation(), problem.operand2(), result.correctAnswer());
+        }
+        Optional<String> audioHash = ttsService.getAudioHash(feedbackText);
         
         // Render feedback
         Map<String, Object> model = new HashMap<>();
@@ -124,6 +149,7 @@ public class QuizHandler {
         model.put("rangeExpanded", result.rangeExpanded());
         model.put("newOperationUnlocked", result.newOperationUnlocked());
         model.put("newStars", result.newStars());
+        model.put("audioHash", audioHash.orElse(null));
         
         ctx.render("fragments/feedback.jte", model);
     }

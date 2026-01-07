@@ -8,11 +8,13 @@ import io.javalin.rendering.template.JavalinJte;
 import mathquiz.storage.DatabaseSetup;
 import mathquiz.storage.Repository;
 import mathquiz.storage.SqliteRepository;
+import mathquiz.tts.TtsCacheService;
 import mathquiz.web.Routes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.time.Clock;
 
 public class App {
@@ -21,9 +23,12 @@ public class App {
     public static void main(String[] args) {
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
         String dataDir = System.getenv().getOrDefault("DATA_DIR", "data");
+        String ttsSpeaker = System.getenv().getOrDefault("TTS_SPEAKER", "liivika");
         
         // Initialize database
-        java.nio.file.Path dbPath = java.nio.file.Path.of(dataDir, "quiz.db");
+        Path dbPath = Path.of(dataDir, "quiz.db");
+        Path ttsDir = Path.of(dataDir, "tts");
+        
         // Ensure data directory exists
         try {
             java.nio.file.Files.createDirectories(dbPath.getParent());
@@ -33,13 +38,16 @@ public class App {
         var dbSetup = DatabaseSetup.setup(dbPath);
         Repository repo = new SqliteRepository(dbSetup.jdbi());
         
-        var app = createApp(repo, Clock.systemDefaultZone());
+        // Initialize TTS cache
+        TtsCacheService ttsService = new TtsCacheService(ttsDir, ttsSpeaker);
+        
+        var app = createApp(repo, Clock.systemDefaultZone(), ttsService);
         app.start(port);
         
         log.info("Math Quiz started on port {}", port);
     }
     
-    public static Javalin createApp(Repository repo, Clock clock) {
+    public static Javalin createApp(Repository repo, Clock clock, TtsCacheService ttsService) {
         var templateEngine = createTemplateEngine();
         
         var app = Javalin.create(config -> {
@@ -47,16 +55,23 @@ public class App {
             config.fileRenderer(new JavalinJte(templateEngine));
         });
         
-        new Routes(repo, clock).configure(app);
+        new Routes(repo, clock, ttsService).configure(app);
         
         return app;
     }
     
     /**
-     * Create app for testing (without database).
+     * Create app for testing (without database, with disabled TTS).
      */
     public static Javalin createApp() {
-        return createApp(null, Clock.systemDefaultZone());
+        return createApp(null, Clock.systemDefaultZone(), TtsCacheService.disabled());
+    }
+    
+    /**
+     * Create app for testing with repository.
+     */
+    public static Javalin createApp(Repository repo, Clock clock) {
+        return createApp(repo, clock, TtsCacheService.disabled());
     }
     
     private static TemplateEngine createTemplateEngine() {

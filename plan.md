@@ -284,7 +284,7 @@ POST /quiz/answer   → feedback fragment + OOB updates
 
 ---
 
-### Milestone 7: Estonian TTS + Audio Caching
+### Milestone 7: Estonian TTS + Audio Caching ✅
 **Goal:** Voice reads problems, cached server-side, 'r' to repeat
 
 **EstonianSpeechFormatter:**

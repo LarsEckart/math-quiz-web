@@ -11,6 +11,7 @@
     <title>${title}</title>
     <link rel="stylesheet" href="/app.css">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="/app.js" defer></script>
 </head>
 <body>
     <main>

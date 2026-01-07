@@ -8,6 +8,7 @@
 @param boolean rangeExpanded
 @param Operation newOperationUnlocked
 @param int newStars
+@param String audioHash = null
 
 <div class="feedback ${correct ? "correct" : "incorrect"}">
     @if(correct)
@@ -30,9 +31,13 @@
         <div class="achievement">🔓 Uus tehe avatud: ${newOperationUnlocked.symbol()}</div>
     @endif
 
+    @if(audioHash != null)
+        <audio id="tts-audio" src="/audio/${audioHash}.wav" autoplay></audio>
+    @endif
+
     <%-- Auto-advance to next problem --%>
     <div hx-get="/quiz/problem"
-         hx-trigger="load delay:1200ms"
+         hx-trigger="load delay:2000ms"
          hx-target="#problem-area"
          hx-swap="innerHTML">
     </div>

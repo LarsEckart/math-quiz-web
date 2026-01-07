@@ -3,6 +3,8 @@ package mathquiz.web;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import mathquiz.storage.Repository;
+import mathquiz.tts.TtsCacheService;
+import mathquiz.web.handlers.AudioHandler;
 import mathquiz.web.handlers.PlayerHandler;
 import mathquiz.web.handlers.QuizHandler;
 
@@ -15,10 +17,12 @@ public class Routes {
     
     private final PlayerHandler playerHandler;
     private final QuizHandler quizHandler;
+    private final AudioHandler audioHandler;
     
-    public Routes(Repository repo, Clock clock) {
+    public Routes(Repository repo, Clock clock, TtsCacheService ttsService) {
         this.playerHandler = new PlayerHandler(repo);
-        this.quizHandler = new QuizHandler(repo, clock);
+        this.quizHandler = new QuizHandler(repo, clock, ttsService);
+        this.audioHandler = new AudioHandler(ttsService);
     }
     
     public void configure(Javalin app) {
@@ -37,6 +41,9 @@ public class Routes {
         app.get("/quiz", quizHandler::showQuiz);
         app.get("/quiz/problem", quizHandler::getProblem);
         app.post("/quiz/answer", quizHandler::submitAnswer);
+        
+        // Audio routes
+        app.get("/audio/{filename}", audioHandler::serveAudio);
     }
     
     private void health(Context ctx) {

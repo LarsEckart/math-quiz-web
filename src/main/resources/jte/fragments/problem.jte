@@ -3,6 +3,7 @@
 @param int operand1
 @param int operand2
 @param Operation operation
+@param String audioHash = null
 
 <div class="problem ${operation.name().toLowerCase()}">
     <div class="equation">
@@ -26,4 +27,10 @@
                required>
         <button type="submit" class="submit-button">Vasta</button>
     </form>
+
+    @if(audioHash != null)
+        <audio id="tts-audio" src="/audio/${audioHash}.wav" autoplay></audio>
+    @endif
+
+    <div class="audio-hint">Vajuta R heli kordamiseks</div>
 </div>
