@@ -59,7 +59,7 @@
 
 ## Milestones
 
-### Milestone 1: Project Skeleton
+### Milestone 1: Project Skeleton ✅
 **Goal:** Compiles, runs, deploys "Hello"
 
 **Build:**

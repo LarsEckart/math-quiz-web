@@ -1,0 +1,2 @@
+-- Placeholder for Milestone 3
+-- Schema will be added when we implement the storage layer

@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'mathquiz'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web framework
+    implementation 'io.javalin:javalin:6.3.0'
+    implementation 'io.javalin:javalin-rendering:6.3.0'
+    
+    // Templating
+    implementation 'gg.jte:jte:3.1.12'
+    
+    // Database
+    implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
+    implementation 'org.jdbi:jdbi3-core:3.45.0'
+    implementation 'org.jdbi:jdbi3-sqlobject:3.45.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'org.flywaydb:flyway-core:10.10.0'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.3'
+    
+    // Testing
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.25.3'
+    testImplementation 'io.javalin:javalin-testtools:6.3.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'mathquiz.App'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'mathquiz.App'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

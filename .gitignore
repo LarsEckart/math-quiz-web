@@ -2,6 +2,7 @@
 .gradle/
 build/
 out/
+jte-classes/
 
 # IDE
 .idea/

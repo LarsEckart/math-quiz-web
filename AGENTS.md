@@ -29,3 +29,7 @@ A web-based math quiz app for kids learning arithmetic (addition, subtraction, m
 ## Project Status
 
 See `plan.md` for the 9-milestone implementation plan.
+
+## Tips
+
+Use tmux when running the server.
