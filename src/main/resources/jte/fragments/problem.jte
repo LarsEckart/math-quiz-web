@@ -5,7 +5,7 @@
 @param Operation operation
 @param String audioHash = null
 
-<div class="problem ${operation.name().toLowerCase()}">
+<div class="problem ${operation.name().toLowerCase()}" data-audio-hash="${audioHash}">
     <div class="equation">
         <span class="operand">${operand1}</span>
         <span class="operator">${operation.symbol()}</span>
@@ -27,10 +27,6 @@
                required>
         <button type="submit" class="submit-button">Vasta</button>
     </form>
-
-    @if(audioHash != null)
-        <audio id="tts-audio" src="/audio/${audioHash}.wav" autoplay></audio>
-    @endif
 
     <div class="audio-hint">Vajuta R heli kordamiseks</div>
 </div>

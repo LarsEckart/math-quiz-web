@@ -17,5 +17,7 @@
     <main>
         ${content}
     </main>
+    <%-- Audio player lives outside problem-area so it doesn't get destroyed on HTMX swaps --%>
+    <audio id="tts-audio"></audio>
 </body>
 </html>

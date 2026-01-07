@@ -10,7 +10,7 @@
 @param int newStars
 @param String audioHash = null
 
-<div class="feedback ${correct ? "correct" : "incorrect"}">
+<div class="feedback ${correct ? "correct" : "incorrect"}" data-audio-hash="${audioHash}">
     @if(correct)
         <div class="feedback-icon">✅</div>
         <div class="feedback-text">Õige!</div>
@@ -31,16 +31,7 @@
         <div class="achievement">🔓 Uus tehe avatud: ${newOperationUnlocked.symbol()}</div>
     @endif
 
-    @if(audioHash != null)
-        <audio id="tts-audio" src="/audio/${audioHash}.wav" autoplay></audio>
-    @endif
-
-    <%-- Auto-advance to next problem --%>
-    <div hx-get="/quiz/problem"
-         hx-trigger="load delay:2000ms"
-         hx-target="#problem-area"
-         hx-swap="innerHTML">
-    </div>
+    <%-- Auto-advance handled by JS after audio finishes --%>
 </div>
 
 <%-- OOB updates for stats --%>
