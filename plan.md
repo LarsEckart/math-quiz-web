@@ -210,7 +210,7 @@ CREATE INDEX idx_attempts_user_ts ON attempts(user_id, ts);
 
 ---
 
-### Milestone 4: Port QuizService
+### Milestone 4: Port QuizService ✅
 **Goal:** Service orchestration, service-layer tests
 
 **QuizService:**
