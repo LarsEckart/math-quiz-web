@@ -4,9 +4,18 @@
     box-sizing: border-box;
 }
 
+:root {
+    --color-addition: #22c55e;
+    --color-subtraction: #3b82f6;
+    --color-multiplication: #a855f7;
+    --color-division: #f97316;
+    --color-correct: #22c55e;
+    --color-incorrect: #ef4444;
+}
+
 body {
     font-family: system-ui, -apple-system, sans-serif;
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     margin: 0;
     padding: 20px;
     min-height: 100vh;
@@ -21,4 +30,328 @@ main {
 h1 {
     font-size: clamp(2rem, 8vw, 4rem);
     margin-bottom: 1rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Player Selection Page */
+.player-section, .create-section {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.player-section h2, .create-section h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+.no-players {
+    color: #666;
+    font-style: italic;
+}
+
+.player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.player-form {
+    margin: 0;
+}
+
+.player-button {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.player-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.player-button:active {
+    transform: translateY(0);
+}
+
+.create-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.name-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.name-input:focus {
+    border-color: #667eea;
+}
+
+.create-button {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: var(--color-addition);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.create-button:hover {
+    background: #16a34a;
+}
+
+/* Quiz Page */
+.quiz-header {
+    background: white;
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.player-name {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.switch-player {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.switch-player:hover {
+    text-decoration: underline;
+}
+
+.stats-bar {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.streak {
+    color: #f97316;
+}
+
+.stars {
+    color: #eab308;
+}
+
+.total-stars {
+    color: #a855f7;
+}
+
+/* Problem Display */
+#problem-area {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading {
+    color: #666;
+    font-size: 1.5rem;
+}
+
+.problem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.equation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.operand {
+    font-size: clamp(3rem, 15vw, 6rem);
+    font-weight: bold;
+    color: #333;
+}
+
+.operator {
+    font-size: clamp(2rem, 10vw, 4rem);
+    font-weight: bold;
+    padding: 0 0.25rem;
+}
+
+.addition .operator { color: var(--color-addition); }
+.subtraction .operator { color: var(--color-subtraction); }
+.multiplication .operator { color: var(--color-multiplication); }
+.division .operator { color: var(--color-division); }
+
+.equals {
+    font-size: clamp(2rem, 10vw, 4rem);
+    color: #666;
+}
+
+.answer-box {
+    font-size: clamp(3rem, 15vw, 6rem);
+    font-weight: bold;
+    color: #999;
+    min-width: 80px;
+}
+
+.answer-form {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.answer-input {
+    width: 150px;
+    padding: 1rem;
+    font-size: 2rem;
+    text-align: center;
+    border: 3px solid #ddd;
+    border-radius: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.answer-input:focus {
+    border-color: #667eea;
+}
+
+.submit-button {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.submit-button:hover {
+    background: #5a67d8;
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+/* Feedback Display */
+.feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.feedback-icon {
+    font-size: 5rem;
+    animation: pop 0.3s ease-out;
+}
+
+.feedback-text {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.feedback.correct .feedback-text {
+    color: var(--color-correct);
+}
+
+.feedback.incorrect .feedback-text {
+    color: var(--color-incorrect);
+}
+
+.achievement {
+    font-size: 1.5rem;
+    color: #667eea;
+    animation: slide-up 0.5s ease-out;
+}
+
+/* Animations */
+@keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-up {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+
+.feedback.incorrect {
+    animation: shake 0.5s ease-out;
+}
+
+/* Hide number input spinners */
+.answer-input::-webkit-outer-spin-button,
+.answer-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.answer-input[type=number] {
+    -moz-appearance: textfield;
 }

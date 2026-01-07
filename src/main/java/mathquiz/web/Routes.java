@@ -2,21 +2,44 @@ package mathquiz.web;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import mathquiz.storage.Repository;
+import mathquiz.web.handlers.PlayerHandler;
+import mathquiz.web.handlers.QuizHandler;
 
-import java.util.Map;
+import java.time.Clock;
 
+/**
+ * Configures all web routes.
+ */
 public class Routes {
     
-    public static void configure(Javalin app) {
-        app.get("/health", Routes::health);
-        app.get("/", Routes::index);
+    private final PlayerHandler playerHandler;
+    private final QuizHandler quizHandler;
+    
+    public Routes(Repository repo, Clock clock) {
+        this.playerHandler = new PlayerHandler(repo);
+        this.quizHandler = new QuizHandler(repo, clock);
     }
     
-    private static void health(Context ctx) {
+    public void configure(Javalin app) {
+        // Health check
+        app.get("/health", this::health);
+        
+        // Root redirects to players
+        app.get("/", ctx -> ctx.redirect("/players"));
+        
+        // Player routes
+        app.get("/players", playerHandler::listPlayers);
+        app.post("/players", playerHandler::createPlayer);
+        app.post("/players/{id}/select", playerHandler::selectPlayer);
+        
+        // Quiz routes
+        app.get("/quiz", quizHandler::showQuiz);
+        app.get("/quiz/problem", quizHandler::getProblem);
+        app.post("/quiz/answer", quizHandler::submitAnswer);
+    }
+    
+    private void health(Context ctx) {
         ctx.result("ok");
-    }
-    
-    private static void index(Context ctx) {
-        ctx.render("index.jte", Map.of("title", "Math Quiz"));
     }
 }

@@ -226,7 +226,7 @@ CREATE INDEX idx_attempts_user_ts ON attempts(user_id, ts);
 
 ---
 
-### Milestone 5: Web UI v1 (Multi-user + Basic Quiz Loop)
+### Milestone 5: Web UI v1 (Multi-user + Basic Quiz Loop) ✅
 **Goal:** Playable quiz, no audio yet
 
 **Routes:**
