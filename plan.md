@@ -91,7 +91,7 @@ src/main/resources/
 
 ---
 
-### Milestone 2: Port Domain Layer
+### Milestone 2: Port Domain Layer ✅
 **Goal:** Pure Java domain logic, unit-tested
 
 **Port from Python:**
