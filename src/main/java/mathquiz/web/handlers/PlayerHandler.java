@@ -17,6 +17,8 @@ public class PlayerHandler {
     
     public static final String SESSION_USER_ID = "userId";
     public static final String SESSION_USER_NAME = "userName";
+    public static final String COOKIE_USER_ID = "rememberedUserId";
+    private static final int COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
     
     private final Repository repo;
     
@@ -68,6 +70,7 @@ public class PlayerHandler {
             user -> {
                 ctx.sessionAttribute(SESSION_USER_ID, user.id());
                 ctx.sessionAttribute(SESSION_USER_NAME, user.name());
+                ctx.cookie(COOKIE_USER_ID, String.valueOf(user.id()), COOKIE_MAX_AGE_SECONDS);
                 log.info("Player selected: {} (id={})", user.name(), user.id());
                 ctx.redirect("/quiz");
             },
@@ -97,5 +100,31 @@ public class PlayerHandler {
      */
     public static String getUserName(Context ctx) {
         return ctx.sessionAttribute(SESSION_USER_NAME);
+    }
+    
+    /**
+     * Try to restore session from persistent cookie.
+     * Called by before filter when session doesn't exist.
+     */
+    public void tryRestoreFromCookie(Context ctx) {
+        if (isLoggedIn(ctx)) {
+            return; // Already logged in
+        }
+        
+        String cookieValue = ctx.cookie(COOKIE_USER_ID);
+        if (cookieValue == null || cookieValue.isBlank()) {
+            return;
+        }
+        
+        try {
+            int userId = Integer.parseInt(cookieValue);
+            repo.getUser(userId).ifPresent(user -> {
+                ctx.sessionAttribute(SESSION_USER_ID, user.id());
+                ctx.sessionAttribute(SESSION_USER_NAME, user.name());
+                log.info("Session restored from cookie for: {} (id={})", user.name(), user.id());
+            });
+        } catch (NumberFormatException e) {
+            log.warn("Invalid rememberedUserId cookie value: {}", cookieValue);
+        }
     }
 }

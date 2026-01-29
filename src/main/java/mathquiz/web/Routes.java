@@ -26,6 +26,9 @@ public class Routes {
     }
     
     public void configure(Javalin app) {
+        // Restore session from cookie if needed (before all requests)
+        app.before(playerHandler::tryRestoreFromCookie);
+        
         // Health check
         app.get("/health", this::health);
         
