@@ -2,6 +2,7 @@
 .gradle/
 build/
 out/
+bin/
 jte-classes/
 
 # IDE
